@@ -32,6 +32,10 @@ function myAutoloader(string $class):void
 $uri = strtolower($_SERVER["REQUEST_URI"]);
 $uri = (strlen($uri)>1)?rtrim($uri, "/"):$uri;
 $uri = strtok($uri, "?");
+if ($uri === "/") {
+    header("Location: /home");
+    exit();
+}
 
 if(!file_exists("../routes.yml")){
     die("Le fichier ../routes.yml n'existe pas");
