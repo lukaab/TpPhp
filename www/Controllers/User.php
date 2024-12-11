@@ -8,7 +8,57 @@ use App\Core\UserValidator;
 
 class User
 {
-    public function login(): void
+
+    public function register(): void
+{
+    $errors = []; // Tableau pour stocker les erreurs
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Récupérer les données soumises
+        $data = [
+            'firstname' => trim($_POST['firstname'] ?? ''),
+            'lastname' => trim($_POST['lastname'] ?? ''),
+            'email' => trim($_POST['email'] ?? ''),
+            'country' => trim($_POST['country'] ?? ''),
+            'pwd' => $_POST['pwd'] ?? '',
+            'pwdconf' => $_POST['pwdconf'] ?? ''
+        ];
+
+        // Validation
+        $validator = new UserValidator();
+        if ($validator->validate($data)) {
+            // Insérer l'utilisateur en base
+            $hashedPwd = password_hash($data['pwd'], PASSWORD_DEFAULT);
+
+            $sql = new SQL(); // Instance de SQL
+            $pdo = $sql->getPDO(); // Récupérer l'objet PDO
+
+            $query = $pdo->prepare(
+                "INSERT INTO users (firstname, lastname, email, country, password) VALUES (?, ?, ?, ?, ?)"
+            );
+            $query->execute([
+                $data['firstname'],
+                $data['lastname'],
+                $data['email'],
+                $data['country'],
+                $hashedPwd
+            ]);
+
+            // Rediriger vers la page de connexion
+            header("Location: /se-connecter");
+            exit();
+        } else {
+            // Collecter les erreurs
+            $errors = $validator->getErrors();
+        }
+    }
+
+    // Passer les erreurs à la vue
+    $view = new View("User/register.php", "back.php");
+    $view->addData("errors", $errors);
+}
+
+public function login(): void
 {
     $errors = []; // Tableau des erreurs
 
@@ -44,4 +94,17 @@ class User
     $view = new View("User/login.php", "back.php");
     $view->addData("errors", $errors);
 }
+
+
+public function logout(): void
+{
+    session_start(); // Démarrer la session pour y accéder
+    session_unset(); // Supprimer toutes les variables de session
+    session_destroy(); // Détruire la session
+
+    // Rediriger l'utilisateur vers la page de connexion
+    header("Location: /se-connecter");
+    exit();
+}
+
 }

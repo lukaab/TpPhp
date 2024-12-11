@@ -1,3 +1,7 @@
+/user/add:
+  controller: "User"
+  action: "register"
+
 /se-connecter:
   controller: "User"
   action: "login"

@@ -15,3 +15,10 @@ if (!empty($errors)) {
     <input name="pwd" type="password" placeholder="votre mot de passe"><br>
     <input type="submit" value="Se connecter"><br>
 </form>
+<p>
+<b>
+Vous n'avez pas de compte ? Inscrivez-vous !
+</b>
+<form method="GET" action="/user/add">
+    <button type="submit">Créer un compte</button>
+</form>
